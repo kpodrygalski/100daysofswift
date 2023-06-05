@@ -48,14 +48,14 @@ getSquare { $0 * $1 }
 
 
 // MARK: Returning closures from functions
-func strangeTravel() -> (String) -> Void {
+func quickTravel() -> (String) -> Void {
     return {
         print("I will visit \($0)")
     }
 }
 
-let strangeResult = strangeTravel()
-strangeResult("Norway")
+let quickTravelResult = quickTravel()
+quickTravelResult("Norway")
 
 
 // MARK: Capturing values
