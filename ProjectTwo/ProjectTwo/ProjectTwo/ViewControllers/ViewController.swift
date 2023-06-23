@@ -12,13 +12,15 @@ class ViewController: UIViewController {
     @IBOutlet var buttonTwo: UIButton!
     @IBOutlet var buttonThree: UIButton!
     
-    var countries = [String]()
-    var score: Int = 0
-    var correctAnswer: Int = 0
+    var countries               = [String]()
+    var score: Int              = 0
+    var correctAnswer: Int      = 0
     var askedQuestionCount: Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
+//      Day_22 - 3. Go back to project 2 and add a bar button item that shows their score when tapped.
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .pause, target: self, action: #selector(showScore))
         
         countries += ["estonia", "france", "germany", "ireland", "italy", "monaco", "nigeria", "poland", "russia", "spain", "uk", "us"]
         
@@ -77,6 +79,12 @@ class ViewController: UIViewController {
         let alertController = UIAlertController(title: title, message: "Your score is: \(score).", preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "Continue", style: .default, handler: askQuestion))
         present(alertController, animated: true)
+    }
+    
+    @objc private func showScore() {
+        let ac = UIAlertController(title: "Score", message: "Your score is: \(score) points.", preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "Ok", style: .cancel))
+        present(ac, animated: true)
     }
 }
 

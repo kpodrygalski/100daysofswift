@@ -1,8 +1,8 @@
 //
 //  ViewController.swift
-//  ProjectOne
+//  ProjectThree
 //
-//  Created by Konrad Podrygalski on 15/06/2023.
+//  Created by Konrad Podrygalski on 23/06/2023.
 //
 
 import UIKit
@@ -15,8 +15,6 @@ class ViewController: UITableViewController {
         
         self.title = "Storm Viewer"
         navigationController?.navigationBar.prefersLargeTitles = true
-//      Day_22 - 2. Go back to project 1 and add a bar button item to the main view controller that recommends the app to other people.
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(recommendApp))
         
         let fm = FileManager.default // Create a file manager.
         let path = Bundle.main.resourcePath! // Declare path to apps bundle.
@@ -31,7 +29,7 @@ class ViewController: UITableViewController {
         
         pictures.sort()
     }
-        
+    
 //    numberOfRowsInSection
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return pictures.count
@@ -53,12 +51,6 @@ class ViewController: UITableViewController {
             vc.totalImagesCount = pictures.count
             navigationController?.pushViewController(vc, animated: true)
         }
-    }
-    
-    @objc private func recommendApp() {
-        let ac = UIAlertController(title: "Recommend App", message: "If you enjoy this app, share it with your friends ☺️", preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "Ok", style: .cancel))
-        present(ac, animated: true)
     }
 }
 
