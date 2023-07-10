@@ -14,7 +14,13 @@ class ViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(promptForAnswer))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
+                                                            target: self,
+                                                            action: #selector(promptForAnswer))
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh,
+                                                           target: self,
+                                                           action: #selector(startGame))
         
         loadWordsFromBundle()
         startGame()
@@ -44,7 +50,7 @@ class ViewController: UITableViewController {
         }
     }
     
-    private func startGame() {
+    @objc private func startGame() {
         title = allWords.randomElement()
         usedWords.removeAll(keepingCapacity: true)
         tableView.reloadData()
@@ -69,6 +75,7 @@ class ViewController: UITableViewController {
     }
     
     private func isReal(word: String) -> Bool {
+        guard let title else { return false }
         let checker = UITextChecker()
         let range = NSRange(location: 0, length: word.utf16.count)
         let misspelledRange = checker.rangeOfMisspelledWord(in: word,
@@ -76,41 +83,46 @@ class ViewController: UITableViewController {
                                                             startingAt: 0,
                                                             wrap: false,
                                                             language: "en")
-    
+        if word.count < 3 {
+            showErrorMessage(title: "Word is too short.",
+                             message: "Please enter word longer then 3 characters.")
+            return false
+        }
+        
+        if word == title.lowercased() {
+            showErrorMessage(title: "Word is the title.",
+                             message: "Given word is the same as current game word.")
+            return false
+        }
+
         return misspelledRange.location == NSNotFound
     }
     
     private func submit(answer: String) {
         let lowerAnswer = answer.lowercased()
-        let errorTitle: String
-        let errorMessage: String
         
         if isPossible(word: lowerAnswer) {
             if isOriginal(word: lowerAnswer) {
                 if isReal(word: lowerAnswer) {
-                    usedWords.insert(answer, at: 0)
+                    usedWords.insert(lowerAnswer, at: 0)
                     
                     let indexPath = IndexPath(row: 0, section: 0)
                     tableView.insertRows(at: [indexPath], with: .automatic)
                     
                     return
                 } else {
-                    errorTitle = "Word not recognized."
-                    errorMessage = "You can't just make them up, you know!"
+                    showErrorMessage(title: "Word not recognized.",
+                                     message: "You can't just make them up, you know!")
                 }
             } else {
-                errorTitle = "Word already used."
-                errorMessage = "Be more original!"
+                showErrorMessage(title: "Word already used.",
+                                 message: "Be more original!")
             }
         } else {
             guard let title else { return }
-            errorTitle = "Word not possible."
-            errorMessage = "You can't spell that word from \(title.lowercased())."
+            showErrorMessage(title:  "Word not possible.",
+                             message: "You can't spell that word from \(title.lowercased()).")
         }
-        
-        let ac = UIAlertController(title: errorTitle, message: errorMessage, preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "Ok", style: .default))
-        present(ac, animated: true)
     }
     
     @objc private func promptForAnswer() {
@@ -123,6 +135,12 @@ class ViewController: UITableViewController {
         }
         
         ac.addAction(submitAction)
+        present(ac, animated: true)
+    }
+    
+    private func showErrorMessage(title: String, message: String) {
+        let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "Ok", style: .default))
         present(ac, animated: true)
     }
     
