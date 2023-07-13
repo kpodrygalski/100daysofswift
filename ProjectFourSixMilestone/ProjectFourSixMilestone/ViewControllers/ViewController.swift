@@ -17,12 +17,16 @@ class ViewController: UITableViewController {
         setupNavigationBarItems()
     }
     
-    func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
-        return "Shopping List"
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return shoppingList.count
     }
     
-    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-        return "Shopping List"
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "shopItemCell", for: indexPath)
+        var content = cell.defaultContentConfiguration()
+        content.text = shoppingList[indexPath.row]
+        cell.contentConfiguration = content
+        return cell
     }
     
     private func setupNavigationBarItems() {
@@ -41,18 +45,6 @@ class ViewController: UITableViewController {
                                                            action: #selector(clearList))
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return shoppingList.count
-    }
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "shopItemCell", for: indexPath)
-        var content = cell.defaultContentConfiguration()
-        content.text = shoppingList[indexPath.row]
-        cell.contentConfiguration = content
-        return cell
-    }
-    
     private func canAddItem(item: String) -> Bool {
         if (!shoppingList.contains(item)) {
             return true
@@ -61,35 +53,14 @@ class ViewController: UITableViewController {
         return false
     }
     
-    private func isValidName(item: String) -> Bool {
-        let checker = UITextChecker()
-        let range = NSRange(location: 0, length: item.utf16.count)
-        let misspelledRange = checker.rangeOfMisspelledWord(in: item,
-                                                            range: range,
-                                                            startingAt: 0,
-                                                            wrap: false,
-                                                            language: "en")
-        
-        if item.count < 3 {
-            return false
-        }
-        
-        return misspelledRange.location == NSNotFound
-    }
-    
     private func saveItemToShoppingList(item: String) {
         if canAddItem(item: item) {
-            if isValidName(item: item) {
-                shoppingList.insert(item, at: 0)
-                
-                let indexPath = IndexPath(row: 0, section: 0)
-                tableView.insertRows(at: [indexPath], with: .automatic)
-                
-                return
-            } else {
-                showAlert(title: "Name too short.",
-                          message: "Provided item name is too short. Please use name with min. 3 characters.")
-            }
+            shoppingList.insert(item, at: 0)
+            
+            let indexPath = IndexPath(row: 0, section: 0)
+            tableView.insertRows(at: [indexPath], with: .automatic)
+            
+            return
         } else {
             showAlert(title: "Item exists.",
                       message: "\(item) exist in list.")
