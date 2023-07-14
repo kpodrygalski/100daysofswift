@@ -28,7 +28,6 @@ class ViewController: UITableViewController {
         let petition = petitions[indexPath.row]
         content.text = petition.title
         content.secondaryText = petition.body
-        content.secondaryText.
         cell.contentConfiguration = content
         return cell
     }
