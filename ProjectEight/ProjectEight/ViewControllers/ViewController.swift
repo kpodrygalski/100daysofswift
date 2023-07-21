@@ -247,8 +247,7 @@ class ViewController: UIViewController {
     
     private func levelUp(action: UIAlertAction) {
         level += 1
-        wrongAnswerCount = 0
-        
+    
         solutions.removeAll(keepingCapacity: true)
         loadLevel()
         
