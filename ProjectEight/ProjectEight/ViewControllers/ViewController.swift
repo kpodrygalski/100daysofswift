@@ -26,6 +26,8 @@ class ViewController: UIViewController {
         }
     }
     
+    var correctAnswersCount: Int = 0
+    
     var level: Int = 1
     
     override func loadView() {
@@ -220,8 +222,9 @@ class ViewController: UIViewController {
             
             currentAnswer.text = ""
             score += 1
+            correctAnswersCount += 1
 
-            if score % 7 == 0 {
+            if correctAnswersCount % 7 == 0 {
                 let ac = UIAlertController(title: "Well done!",
                                            message: "Are you ready for the next level?",
                                            preferredStyle: .alert)
