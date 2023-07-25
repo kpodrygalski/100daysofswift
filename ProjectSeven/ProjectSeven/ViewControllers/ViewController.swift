@@ -88,11 +88,20 @@ class ViewController: UITableViewController {
     }
     
     private func search(searchText: String) {
-        filteredPetitions = petitions.filter { $0.title.contains(searchText) || $0.body.contains(searchText) }
-        if !filteredPetitions.isEmpty {
-            tableView.reloadData()
-        } else {
-            filteredPetitions = petitions
+//        Day_41 - Filter data on background thread
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self else { return }
+            self.filteredPetitions = petitions.filter { $0.title.contains(searchText) || $0.body.contains(searchText) }
+        }
+        
+//        Day_41 - Update UI on main thread with filtered data
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if !self.filteredPetitions.isEmpty {
+                tableView.reloadData()
+            } else {
+                self.filteredPetitions = self.petitions
+            }
         }
     }
     

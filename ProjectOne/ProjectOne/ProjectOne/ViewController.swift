@@ -17,19 +17,23 @@ class ViewController: UITableViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
 //      Day_22 - 2. Go back to project 1 and add a bar button item to the main view controller that recommends the app to other people.
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(recommendApp))
-        
-        let fm = FileManager.default // Create a file manager.
-        let path = Bundle.main.resourcePath! // Declare path to apps bundle.
-        let items = try! fm.contentsOfDirectory(atPath: path) // Grab contents from directory at given path.
-        
-//        Loop over items directory and append to pictures array.
-        for item in items {
-            if item.hasPrefix("nssl") {
-                pictures.append(item)
+//        Day_41 - Loading NSSL images on background thread
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let fm = FileManager.default // Create a file manager.
+            let path = Bundle.main.resourcePath! // Declare path to apps bundle.
+            let items = try! fm.contentsOfDirectory(atPath: path) // Grab contents from directory at given path.
+            
+    //        Loop over items directory and append to pictures array.
+            for item in items {
+                if item.hasPrefix("nssl") {
+                    self?.pictures.append(item)
+                }
             }
+            
+            self?.pictures.sort()
         }
-        
-        pictures.sort()
+//    Day_41 - Reloading table view one loading data was finished.
+        tableView.reloadData()
     }
         
 //    numberOfRowsInSection
@@ -56,7 +60,9 @@ class ViewController: UITableViewController {
     }
     
     @objc private func recommendApp() {
-        let ac = UIAlertController(title: "Recommend App", message: "If you enjoy this app, share it with your friends ☺️", preferredStyle: .alert)
+        let ac = UIAlertController(title: "Recommend App",
+                                   message: "If you enjoy this app, share it with your friends ☺️",
+                                   preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "Ok", style: .cancel))
         present(ac, animated: true)
     }
