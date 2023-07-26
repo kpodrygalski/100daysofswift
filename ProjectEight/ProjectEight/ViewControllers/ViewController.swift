@@ -33,30 +33,23 @@ class ViewController: UIViewController {
     override func loadView() {
         view = UIView()
         view.backgroundColor = .white
-        
-        setupScoreLabel()
-        setupCluesLabel()
-        setupAnswersLabel()
-        setupCurrentAnswerTextField()
-        setupButtons()
-        setupButtonsView()
-        setupConstraints()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         loadLevel()
+        setupUI()
     }
     
-    private func setupScoreLabel() {
+    private func setupUI() {
+//        MARK: scoreLabel
         scoreLabel = UILabel()
         scoreLabel.translatesAutoresizingMaskIntoConstraints = false
         scoreLabel.textAlignment = .right
         scoreLabel.text = "Score: 0"
         view.addSubview(scoreLabel)
-    }
-    
-    private func setupCluesLabel() {
+        
+//        MARK: cluesLabel
         cluesLabel = UILabel()
         cluesLabel.translatesAutoresizingMaskIntoConstraints = false
         cluesLabel.font = UIFont.systemFont(ofSize: 24)
@@ -64,9 +57,8 @@ class ViewController: UIViewController {
         cluesLabel.numberOfLines = 0
         cluesLabel.setContentHuggingPriority(UILayoutPriority(1), for: .vertical)
         view.addSubview(cluesLabel)
-    }
-    
-    private func setupAnswersLabel() {
+        
+//        MARK: answersLabel
         answersLabel = UILabel()
         answersLabel.translatesAutoresizingMaskIntoConstraints = false
         answersLabel.font = UIFont.systemFont(ofSize: 24)
@@ -75,9 +67,8 @@ class ViewController: UIViewController {
         answersLabel.textAlignment = .right
         answersLabel.setContentHuggingPriority(UILayoutPriority(1), for: .vertical)
         view.addSubview(answersLabel)
-    }
-    
-    private func setupCurrentAnswerTextField() {
+        
+//        MARK: currentAnswerTextField
         currentAnswer = UITextField()
         currentAnswer.translatesAutoresizingMaskIntoConstraints = false
         currentAnswer.placeholder = "Tap letters to guess"
@@ -85,9 +76,8 @@ class ViewController: UIViewController {
         currentAnswer.font = UIFont.systemFont(ofSize: 44)
         currentAnswer.isUserInteractionEnabled = false
         view.addSubview(currentAnswer)
-    }
-    
-    private func setupButtons() {
+        
+//        MARK: submitButton / clearButton
         submitButton = UIButton(type: .system)
         submitButton.translatesAutoresizingMaskIntoConstraints = false
         submitButton.setTitle("Submit".uppercased(), for: .normal)
@@ -99,9 +89,8 @@ class ViewController: UIViewController {
         clearButton.setTitle("Clear".uppercased(), for: .normal)
         clearButton.addTarget(self, action: #selector(clearTapped), for: .touchUpInside)
         view.addSubview(clearButton)
-    }
-    
-    private func setupButtonsView() {
+        
+//        MARK: buttonsView
         buttonsView = UIView()
         buttonsView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(buttonsView)
@@ -124,10 +113,8 @@ class ViewController: UIViewController {
                 letterButtons.append(letterButton)
             }
         }
-    }
-    
-    private func setupConstraints() {
-        // Constraints
+        
+//        MARK: Constraints
         NSLayoutConstraint.activate([
             scoreLabel.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
             scoreLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
