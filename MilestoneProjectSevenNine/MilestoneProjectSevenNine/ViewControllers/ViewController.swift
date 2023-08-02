@@ -35,7 +35,7 @@ class ViewController: UIViewController {
     
     private func loadRandomWord() {
         //        Load words from hangman.txt file in background thread.
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        DispatchQueue.global(qos: .default).async { [weak self] in
             guard let self else { return }
             if let startWordsURL = Bundle.main.url(forResource: "hangman", withExtension: "txt") {
                 if let startWords = try? String(contentsOf: startWordsURL) {
