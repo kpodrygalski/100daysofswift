@@ -50,7 +50,14 @@ class ViewController: UIViewController {
             self.word = self.words.randomElement() ?? "TEST"
         }
         
-        print(word)
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            print(self.word)
+            //            Display selected word in ????? form.
+            for _ in self.word {
+                self.selectedWordLabel.text! += "?"
+            }
+        }
     }
     
     private func setupUI() {
@@ -105,10 +112,6 @@ class ViewController: UIViewController {
         ])
     }
     
-    private func submitAnswer(action: UIAlertAction) {
-        //        Submit user answer
-    }
-    
     @objc private func promptUserInput() {
         //        Show UIAlertController with text field to input user answer.
         let ac = UIAlertController(title: "Enter letter", message: nil, preferredStyle: .alert)
@@ -117,24 +120,64 @@ class ViewController: UIViewController {
         let submitAnswerAction = UIAlertAction(title: "Submit", style: .default) { [weak self, weak ac] _ in
             guard let self else { return }
             guard let answer = ac?.textFields?[0].text else { return }
+            
             if answer.count == 1 {
-                self.usedLetters.append(contentsOf: answer)
-                for letter in self.word {
-                    let strLetter = String(letter)
+                if self.word.contains(answer.uppercased()) {
+                    self.usedLetters.append(contentsOf: answer.uppercased())
                     
-                    if self.usedLetters.contains(strLetter) {
-                        self.promptText += strLetter
-                    } else {
-                        self.promptText += "?"
-                        self.selectedWordLabel.text! = self.promptText
+                    self.promptText = ""
+                    
+                    for letter in self.word {
+                        let strLetter = String(letter)
+                        
+                        if self.usedLetters.contains(strLetter) {
+                            self.promptText += strLetter
+                        } else {
+                            self.promptText += "?"
+                        }
                     }
+                    
+                    self.score += 1
+                    
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self else { return }
+                        self.selectedWordLabel.text = self.promptText
+                        
+                        if self.word == self.selectedWordLabel.text {
+                            self.showAlert(title: "You win",
+                                           message: "Correct! Hidden word was: \(self.word). Your score is: \(self.score) of \(self.word.count)")
+                            self.resetGameAfterWinOrLose()
+                        }
+                        
+                    }
+                } else {
+                    self.wrongAnswers += 1
                 }
             }
+            
+            if self.wrongAnswers == self.maxWrongAttempts {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    self.showAlert(title: "You lose", message: "The hidden word was: \(self.word). Your score is: \(self.score) of \(self.word.count)")
+                    self.resetGameAfterWinOrLose()
+                }
+            }
+            
         }
         
         ac.addAction(submitAnswerAction)
         ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(ac, animated: true)
+    }
+    
+    private func resetGameAfterWinOrLose() {
+        score = 0
+        wrongAnswers = 0
+        word = ""
+        selectedWordLabel.text = ""
+        promptText = ""
+        usedLetters.removeAll()
+        loadRandomWord()
     }
     
     @objc private func resetGame() {
@@ -143,10 +186,7 @@ class ViewController: UIViewController {
         
         let resetGameAction = UIAlertAction(title: "Reset", style: .destructive) { [weak self] _ in
             guard let self else { return }
-            self.score = 0
-            self.word = ""
-            self.selectedWordLabel.text = ""
-            self.usedLetters.removeAll()
+            self.resetGameAfterWinOrLose()
         }
         
         ac.addAction(resetGameAction)
