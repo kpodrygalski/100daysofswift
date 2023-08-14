@@ -10,6 +10,7 @@ import UIKit
 class ViewController: UITableViewController {
     var allWords = [String]()
     var usedWords = [String]()
+    var currentWord: String = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,7 +21,7 @@ class ViewController: UITableViewController {
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh,
                                                            target: self,
-                                                           action: #selector(startGame))
+                                                           action: #selector(resetGame))
         
         loadWordsFromBundle()
         startGame()
@@ -50,9 +51,35 @@ class ViewController: UITableViewController {
         }
     }
     
-    @objc private func startGame() {
-        title = allWords.randomElement()
+    @objc private func resetGame() {
+        guard let randomWord = allWords.randomElement() else { return }
+        title = randomWord
+        currentWord = randomWord
         usedWords.removeAll(keepingCapacity: true)
+        
+        tableView.reloadData()
+    }
+    
+    @objc private func startGame() {
+        guard let randomWord = allWords.randomElement() else { return }
+        title = randomWord
+        currentWord = randomWord
+        usedWords.removeAll(keepingCapacity: true)
+        
+        let defaults = UserDefaults.standard
+        if let savedGameState = defaults.object(forKey: "gameState") as? Data {
+            let jsonDecoder = JSONDecoder()
+            
+            do {
+                let jsonData = try jsonDecoder.decode(GameState.self, from: savedGameState)
+                title = jsonData.currentWord
+                currentWord = jsonData.currentWord
+                usedWords = jsonData.usedWords
+            } catch {
+                print("Failed to load gameState.")
+            }
+        }
+        
         tableView.reloadData()
     }
     
@@ -108,6 +135,7 @@ class ViewController: UITableViewController {
                     
                     let indexPath = IndexPath(row: 0, section: 0)
                     tableView.insertRows(at: [indexPath], with: .automatic)
+                    saveGameState()
                     
                     return
                 } else {
@@ -142,6 +170,17 @@ class ViewController: UITableViewController {
         let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "Ok", style: .default))
         present(ac, animated: true)
+    }
+    
+    private func saveGameState() {
+        let gameState = GameState(currentWord: currentWord, usedWords: usedWords)
+        let jsonEncoder = JSONEncoder()
+        if let savedGameState = try? jsonEncoder.encode(gameState) {
+            let defaults = UserDefaults.standard
+            defaults.set(savedGameState, forKey: "gameState")
+        } else {
+            print("Failed to save game state.")
+        }
     }
     
 }
